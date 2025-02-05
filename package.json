@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node index.js",
+    "build:ui": "rm -rf dist && cd ../notes_frontend/ && npm run build && cp -r dist ../notes_fso",
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -4,7 +4,7 @@ import cors from 'cors';
 
 const app = express();
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 let notes = [
   { id: '1', content: 'HTML is easy', important: true },
