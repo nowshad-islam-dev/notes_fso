@@ -2,6 +2,6 @@ POST http://localhost:3002/api/notes
 Content-Type: application/json
 
 {
-    "content" : "Full stack open is awesome",
-    "important": true
+    "content" : "Nee",
+    "important": false
 }

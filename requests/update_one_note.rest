@@ -1,7 +1,6 @@
-PUT http://localhost:3002/api/:id
+PUT http://localhost:3002/api/notes/67a4ea6b40ecd189feab7e6d
 Content-Type: application/json
 
 {
-    "content" : "I am now adapted with rest client"
-    
+    "content" : "bro!"
 }
