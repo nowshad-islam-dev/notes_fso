@@ -1,10 +1,19 @@
+// load the environmet variables
+// import dotenv from 'dotenv';
+// dotenv.config();
+import 'dotenv/config';
+
 import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
 
+// models import
+import Note from './models/note.models.js';
+
+import errorHandler from './middlewares/error.js';
 const app = express();
 
-const PORT = process.env.PORT || 3001;
+const port = process.env.PORT || 3001;
 
 let notes = [
   { id: '1', content: 'HTML is easy', important: true },
@@ -16,18 +25,16 @@ let notes = [
   },
 ];
 
-const generateId = () => {
-  const maxIdNumber =
-    notes.length > 0 ? Math.max(...notes.map((note) => Number(note.id))) : 0;
-  return String(maxIdNumber + 1);
-};
+// const generateId = () => {
+//   const maxIdNumber =
+//     notes.length > 0 ? Math.max(...notes.map((note) => Number(note.id))) : 0;
+//   return String(maxIdNumber + 1);
+// };
 
 // middlewares
-app.use(cors());
-
-app.use(express.json({ limit: '100kb' }));
-
 app.use(express.static('dist'));
+app.use(express.json({ limit: '100kb' }));
+app.use(cors());
 
 app.use(
   morgan(function (tokens, req, res) {
@@ -48,13 +55,15 @@ app.use(
 
 // routes
 app.get('/api/notes', (req, res) => {
-  res.json(notes);
+  Note.find({}).then((notes) => res.json(notes));
 });
 
-app.get('/api/notes/:id', (req, res) => {
-  const id = req.params.id;
-  const note = notes.find((note) => note.id === id);
-  note ? res.json(note) : res.status(404).end();
+app.get('/api/notes/:id', (req, res, next) => {
+  Note.findById(req.params.id)
+    .then((note) => {
+      note ? res.json(note) : res.status(404).end();
+    })
+    .catch((error) => next(error));
 });
 
 app.post('/api/notes', (req, res) => {
@@ -62,21 +71,32 @@ app.post('/api/notes', (req, res) => {
 
   if (!body.content) return res.status(400).json({ error: 'Content missing' });
 
-  const note = {
+  const note = new Note({
     content: body.content,
-    important: Boolean(body.important) || false,
-    id: generateId(),
-  };
+    important: body.important || false,
+  });
 
-  notes = notes.concat();
-  res.json(note);
+  note.save().then((savedNote) => res.json(savedNote));
 });
 
-app.delete('/api/notes/:id', (req, res) => {
-  const id = req.params.id;
-  notes = notes.filter((note) => note.id !== id);
+app.put('/api/notes/:id', (req, res, next) => {
+  const body = req.body;
+  const note = {
+    content: body.content,
+    important: body.important || false,
+  };
+  Note.findByIdAndUpdate(req.params.id, note, { new: true })
+    .then((updatedNote) => res.json(updatedNote))
+    .catch((error) => next(error));
+});
 
-  res.status(204).end();
+app.delete('/api/notes/:id', (req, res, next) => {
+  Note.findByIdAndDelete(req.params.id)
+    .then((result) => res.status(204).end())
+    .catch((error) => {
+      // console.log(error.message);
+      next(error);
+    });
 });
 
 // show error for invalid routes
@@ -84,5 +104,6 @@ const unknownEndpoint = (req, res) => {
   return res.status(404).send({ error: 'unknown endpoint' });
 };
 app.use(unknownEndpoint);
+app.use(errorHandler);
 
-app.listen(PORT, () => console.log(`Server running at port: ${PORT}`));
+app.listen(port, () => console.log(`Server running at port: ${port}`));

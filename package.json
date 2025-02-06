@@ -1,6 +1,6 @@
 {
   "name": "backend-notes",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "This is the backend for notes project",
   "main": "index.js",
   "type": "module",
@@ -14,7 +14,9 @@
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "mongoose": "^8.10.0",
     "morgan": "^1.10.0"
   },
   "devDependencies": {
