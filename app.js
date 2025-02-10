@@ -3,6 +3,7 @@ import config from './utils/config.js';
 
 // packages import
 import express from 'express';
+import 'express-async-errors';
 const app = express(); // create app object
 
 import mongoose from 'mongoose';
@@ -23,7 +24,7 @@ const uri = config.MONGO_URI; // MongoDB connection string
 
 mongoose
   .connect(uri)
-  .then((result) => console.log('DB Connected'))
+  .then(() => console.log('DB Connected'))
   .catch((error) => console.log('DB Connection Error', error.message));
 
 // middlewares

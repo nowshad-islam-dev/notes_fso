@@ -1,5 +1,4 @@
-# Created by https://www.toptal.com/developers/gitignore/api/node
-# Edit at https://www.toptal.com/developers/gitignore?templates=node
+
 
 ### Node ###
 # Logs
@@ -68,4 +67,6 @@ web_modules/
 .yarn/install-state.gz
 .pnp.*
 
-
+#tests
+tests/
+utils/for_testing.js

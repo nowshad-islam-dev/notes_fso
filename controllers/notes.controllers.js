@@ -6,55 +6,49 @@ const router = express.Router();
 import Note from '../models/note.models.js';
 
 // routes
-router.get('/', (req, res) => {
-  Note.find({}).then((notes) => res.json(notes));
+router.get('/', async (req, res) => {
+  await Note.find({}).then((notes) => res.json(notes));
 });
 
-router.get('/id', (req, res, next) => {
-  Note.findById(req.params.id)
-    .then((note) => {
-      note ? res.json(note) : res.status(404).end();
-    })
-    .catch((error) => next(error));
+router.get('/:id', async (req, res) => {
+  const note = await Note.findById(req.params.id);
+
+  note ? res.json(note) : res.status(404).end();
 });
 
-router.post('/', (req, res, next) => {
+router.post('/', async (req, res) => {
   const body = req.body;
-
-  // if (!body.content) return res.status(400).json({ error: 'Content missing' });
 
   const note = new Note({
     content: body.content,
     important: body.important || false,
   });
 
-  note
-    .save()
-    .then((savedNote) => res.json(savedNote))
-    .catch((error) => next(error));
+  const savedNote = await note.save();
+  res.status(201).json(savedNote);
 });
 
-router.put('/:id', (req, res, next) => {
+router.put('/:id', async (req, res) => {
   const body = req.body;
   const note = {
     content: body.content,
     important: body.important || false,
   };
-  // turn on validation (it is off by default when updating data)
-  Note.findByIdAndUpdate(req.params.id, note, {
+
+  // turn on mongoose validation (it is off by default when updating data)
+  const updatedNote = await Note.findByIdAndUpdate(req.params.id, note, {
     new: true,
     runValidators: true,
     context: 'query',
-  })
-    .then((updatedNote) => res.json(updatedNote))
-    .catch((error) => next(error));
+  });
+
+  res.json(updatedNote);
 });
 
-router.delete('/:id', (req, res, next) => {
-  Note.findByIdAndDelete(req.params.id)
-    .then((result) => res.status(204).end())
-    .catch((error) => {
-      next(error);
-    });
+router.delete('/:id', async (req, res) => {
+  await Note.findByIdAndDelete(req.params.id);
+
+  res.status(204).end();
 });
+
 export default router;
